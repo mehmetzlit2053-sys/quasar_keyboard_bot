@@ -409,6 +409,45 @@ transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s ease, height 0
 #quasar-range-input { -webkit-appearance: none; width: 100%; background: transparent; outline: none; margin: 8px 0; }
 #quasar-range-input::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #1a0000; border: 1px solid #ff0000; }
 #quasar-range-input::-webkit-slider-thumb { height: 16px; width: 12px; background: #ff0000; cursor: pointer; -webkit-appearance: none; margin-top: -6px; box-shadow: 0 0 10px #ff0000; border: none; border-radius: 0px; }
+/* --- CHROME, SAFARI, EDGE, OPERA (Webkit) --- */
+#quasar-range-input::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  background: #1a0000;
+  border: 1px solid #ff0000;
+}
+
+#quasar-range-input::-webkit-slider-thumb {
+  height: 16px;
+  width: 12px;
+  background: #ff0000;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -6px; /* Track'in ortasına gelmesi için */
+  box-shadow: 0 0 10px #ff0000;
+  border: none;
+  border-radius: 0px;
+}
+
+/* --- FIREFOX --- */
+#quasar-range-input::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  background: #1a0000;
+  border: 1px solid #ff0000;
+}
+
+#quasar-range-input::-moz-range-thumb {
+  height: 16px;
+  width: 12px;
+  background: #ff0000;
+  cursor: pointer;
+  box-shadow: 0 0 10px #ff0000;
+  border: none;
+  border-radius: 0px;
+}
 #quasar-console-box::-webkit-scrollbar { height: 4px; }
 #quasar-console-box::-webkit-scrollbar-track { background: #070000; }
 #quasar-console-box::-webkit-scrollbar-thumb { background: #ff0000; }
