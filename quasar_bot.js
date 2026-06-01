@@ -154,33 +154,28 @@
             async function typeChar(char) {
                 if (!hedefTextarea) return;
 
-                // 1. Hazırlık: Odaklanma
+
                 if (document.activeElement !== hedefTextarea) {
                     hedefTextarea.focus();
                 }
 
-                // 2. Klavye Özelliklerini Hazırla
                 const isSpace = char === " ";
                 const isUpperCase = !isSpace && char === char.toUpperCase() && char !== char.toLowerCase();
                 const keyCode = isSpace ? 32 : char.charCodeAt(0);
                 const code = isSpace ? "Space" : "Key" + char.toUpperCase();
 
-                // 3. Shift Tuşu (Başlangıç)
                 if (isUpperCase) {
                     hedefTextarea.dispatchEvent(new KeyboardEvent("keydown", { key: "Shift", code: "ShiftLeft", keyCode: 16, which: 16, bubbles: true }));
                 }
 
-                // 4. Yazma İşlemi (isTrusted hatası vermeyen güvenli yöntem)
-                // execCommand metni yazar ve sitenin klavye olaylarını tetiklemez (korumayı aşar)
+
                 document.execCommand('insertText', false, char);
 
-                // 5. Olay Dizisi (Sitenin "klavye basıldı" dinleyicilerini tetiklemek için)
                 hedefTextarea.dispatchEvent(new KeyboardEvent("keydown", { key: char, code, keyCode, which: keyCode, bubbles: true, cancelable: true }));
                 hedefTextarea.dispatchEvent(new InputEvent("beforeinput", { bubbles: true, cancelable: true, inputType: "insertText", data: char }));
                 hedefTextarea.dispatchEvent(new InputEvent("input", { bubbles: true, cancelable: true, inputType: "insertText", data: char }));
                 hedefTextarea.dispatchEvent(new KeyboardEvent("keyup", { key: char, code, keyCode, which: keyCode, bubbles: true, cancelable: true }));
 
-                // 6. Shift ve Space (Bitiş)
                 if (isUpperCase) {
                     hedefTextarea.dispatchEvent(new KeyboardEvent("keyup", { key: "Shift", code: "ShiftLeft", keyCode: 16, which: 16, bubbles: true }));
                 }
@@ -188,12 +183,10 @@
                     hedefTextarea.dispatchEvent(new KeyboardEvent("keypress", { key: " ", code: "Space", keyCode: 32, which: 32, bubbles: true, cancelable: true }));
                 }
 
-                // 7. Framework Senkronizasyonu (React/Vue/Angular için zorunlu)
                 const descriptor = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
                 if (descriptor && descriptor.set) {
                     descriptor.set.call(hedefTextarea, hedefTextarea.value);
                 }
-                // React Tracker (Input kutusu boş kalmasın diye)
                 if (hedefTextarea._valueTracker) {
                     hedefTextarea._valueTracker.setValue(hedefTextarea.value);
                 }
@@ -218,7 +211,6 @@
                 let char = karakterler[i];
                 mevcutKelime += char;
 
-                // Hata simülasyonu (Aynı)
                 if (window.quasarHumanMode && Math.random() < 0.03) {
                     let fakeChar = String.fromCharCode(char.charCodeAt(0) + (Math.random() > 0.5 ? 1 : -1));
                     await typeChar(fakeChar);
@@ -228,16 +220,12 @@
                 }
 
                 await typeChar(char);
-
-                // KELİME BAZLI LOG MANTIĞI:
-                // Eğer bir boşluğa geldiysen veya metnin sonuna geldiysen log yaz
                 if (char === ' ' || i === karakterler.length - 1) {
                     tamamlananKelimeSayisi++;
                     quasarLog(`${l.inject}: Kelime ${tamamlananKelimeSayisi}/${toplamKelimeSayisi} tamamlandı.`);
-                    mevcutKelime = ""; // Biriktiriciyi sıfırla
+                    mevcutKelime = "";
                 }
 
-                // Gecikme ayarları (Aynı)
                 if (char === ' ') {
                     await sleep(getDynamicDelay() * (window.quasarHumanMode ? 3 : 1));
                 } else if (['.', '!', '?'].includes(char)) {
@@ -295,7 +283,6 @@
             }
         }, 400);
 
-// --- SAF KIRMIZI AGRESİF INTERFACE PANEL TASARIMI ---
         let QuasarPanel = document.createElement('div');
         QuasarPanel.id = 'quasar-bot-panel';
         QuasarPanel.style.cssText = `
@@ -455,7 +442,6 @@ font-size: 13px !important; font-weight: bold !important; background: transparen
         });
         HumanModeButton.addEventListener('mousedown', (e) => e.stopPropagation());
 
-// Otomatik Başlatma Modu Butonu (⚡)
         let AutoModeButton = document.createElement('button');
         AutoModeButton.className = "quasar-utility-btn";
         AutoModeButton.innerHTML = `<svg width="20px" height="20px" viewBox="-1 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>lightning [#ff0000]</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Dribbble-Light-Preview" transform="translate(-101.000000, -2559.000000)" fill="#ff0000"> <g id="icons" transform="translate(56.000000, 160.000000)"> <path d="M49.27,2409 L53,2404.524 L53,2409 L49.27,2409 Z M55,2409 L58.73,2409 L55,2413.476 L55,2409 Z M63,2407 L55,2407 L55,2399 L45,2411 L53,2411 L53,2419 L63,2407 Z" id="lightning-[#ff0000]"> </path> </g> </g> </g> </g></svg>`;
@@ -492,7 +478,7 @@ font-size: 13px !important; font-weight: bold !important; background: transparen
             quasarLog("AUTOMATİON_TRIGGER_ARMED");
             let clicked = new WeakSet();
             let isProcessing = false;
-            let lastExecution = 0; // Throttle kontrolü için
+            let lastExecution = 0;
 
             function safeClick(element, delay, btnName, onComplete) {
                 if (!element || clicked.has(element)) return;
@@ -513,7 +499,6 @@ font-size: 13px !important; font-weight: bold !important; background: transparen
                         console.log(`[BOT] -> Hata [${btnName}]:`, e);
                     }
 
-                    // Kilit süresini 800ms'den 150ms'ye düşürdük. Seri tıklamalar için ideal.
                     setTimeout(() => {
                         isProcessing = false;
                         if (onComplete) onComplete();
@@ -522,9 +507,8 @@ font-size: 13px !important; font-weight: bold !important; background: transparen
             }
 
             const observer = new MutationObserver(() => {
-                // PERFORMANS KORUMASI (Throttle): Fonksiyonun ardı ardına nanosaniyede bir çalışmasını engeller (Hızı uçurur)
                 const now = Date.now();
-                if (now - lastExecution < 30) return; // 30ms'de birden daha sık çalışma
+                if (now - lastExecution < 30) return;
                 lastExecution = now;
 
                 if (isProcessing) return;
@@ -599,7 +583,7 @@ font-size: 13px !important; font-weight: bold !important; background: transparen
         ShieldModeButton.className = "quasar-utility-btn";
         ShieldModeButton.innerHTML = `<svg width="20px" height="20px" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 16L4.35009 13.3929C2.24773 11.8912 1 9.46667 1 6.88306V3L8 0L15 3V6.88306C15 9.46667 13.7523 11.8912 11.6499 13.3929L8 16ZM12.2071 5.70711L10.7929 4.29289L7 8.08579L5.20711 6.29289L3.79289 7.70711L7 10.9142L12.2071 5.70711Z" fill="#ff0000"></path></svg>`;
         if (window.quasarShieldMode) {
-            ShieldModeButton.classList.add('active'); // Başlangıçta arayüzde aktif göster
+            ShieldModeButton.classList.add('active'); 
         }
         ShieldModeButton.addEventListener('click', function(e) {
             e.stopPropagation();
