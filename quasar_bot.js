@@ -151,7 +151,7 @@
                 return window.quasarHumanMode ? base * (Math.random() * 0.4 + 0.8) : base;
             }
 
-async function typeChar(char) {
+            async function typeChar(char) {
                 if (!hedefTextarea) return;
                 if (document.activeElement !== hedefTextarea) {
                     hedefTextarea.focus();
