@@ -151,33 +151,33 @@
                 return window.quasarHumanMode ? base * (Math.random() * 0.4 + 0.8) : base;
             }
 
-            async function typeChar(char) {
+async function typeChar(char) {
                 if (!hedefTextarea) return;
-
-
                 if (document.activeElement !== hedefTextarea) {
                     hedefTextarea.focus();
                 }
-
                 const isSpace = char === " ";
                 const isUpperCase = !isSpace && char === char.toUpperCase() && char !== char.toLowerCase();
                 const keyCode = isSpace ? 32 : char.charCodeAt(0);
                 const code = isSpace ? "Space" : "Key" + char.toUpperCase();
-
+                const createEvent = (type, props) => {
+                    const quasarEventCreate = new KeyboardEvent(type, { ...props, bubbles: true, cancelable: true });
+                    return quasarEventCreate;
+                };
                 if (isUpperCase) {
-                    hedefTextarea.dispatchEvent(new KeyboardEvent("keydown", { key: "Shift", code: "ShiftLeft", keyCode: 16, which: 16, bubbles: true }));
+                    hedefTextarea.dispatchEvent(createEvent("keydown", { key: "Shift", code: "ShiftLeft", keyCode: 16, which: 16 }));
                 }
-
-
                 document.execCommand('insertText', false, char);
-
-                hedefTextarea.dispatchEvent(new KeyboardEvent("keydown", { key: char, code, keyCode, which: keyCode, bubbles: true, cancelable: true }));
+                hedefTextarea.dispatchEvent(createEvent("keydown", { key: char, code, keyCode, which: keyCode }));
                 hedefTextarea.dispatchEvent(new InputEvent("beforeinput", { bubbles: true, cancelable: true, inputType: "insertText", data: char }));
                 hedefTextarea.dispatchEvent(new InputEvent("input", { bubbles: true, cancelable: true, inputType: "insertText", data: char }));
-                hedefTextarea.dispatchEvent(new KeyboardEvent("keyup", { key: char, code, keyCode, which: keyCode, bubbles: true, cancelable: true }));
-
+                hedefTextarea.dispatchEvent(createEvent("keyup", { key: char, code, keyCode, which: keyCode }));
+                hedefTextarea.dispatchEvent(new Event('change', { bubbles: true }));
+                hedefTextarea.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true, cancelable: true, data: char }));
+                hedefTextarea.dispatchEvent(new CompositionEvent("compositionupdate", { bubbles: true, cancelable: true, data: char }));
+                hedefTextarea.dispatchEvent(new CompositionEvent("compositionend", { bubbles: true, cancelable: true, data: char }));
                 if (isUpperCase) {
-                    hedefTextarea.dispatchEvent(new KeyboardEvent("keyup", { key: "Shift", code: "ShiftLeft", keyCode: 16, which: 16, bubbles: true }));
+                    hedefTextarea.dispatchEvent(createEvent("keyup", { key: "Shift", code: "ShiftLeft", keyCode: 16, which: 16 }));
                 }
                 if (isSpace) {
                     hedefTextarea.dispatchEvent(new KeyboardEvent("keypress", { key: " ", code: "Space", keyCode: 32, which: 32, bubbles: true, cancelable: true }));
