@@ -243,48 +243,53 @@
 // --- GÜVENLİKLİ ARKA PLAN OTOMATİK EKRAN TARAYICI (OBSERVER) ---
         window.quasarAutoLock = false;
 
-        setInterval(async () => {
-    // 1. Dil değişkenini en başa al, her yerde erişilebilir olsun
-    const l = quasarLanguages[window.quasarLang] || quasarLanguages.TR;
-    const aktifModal = document.querySelector('.modal.show');
+           setInterval(async () => {
+            const l = quasarLanguages[window.quasarLang] || quasarLanguages.TR;
+            const aktifModal = [...document.querySelectorAll('.modal.show')]
+                .find(el => getComputedStyle(el).display === 'block');
 
-    // 2. Modal kapandıysa ve bot çalışıyorsa durdur
-    if (!aktifModal && window.isQuasarBotRunning) {
-        window.stopQuasarBot = true;
-        window.isQuasarBotRunning = false;
-        quasarLog(l.textarea_err); // Artık l tanımlı olduğu için hata vermez
-        return;
-    }
-
-    // 3. Bot çalıştırma mantığı
-    if (window.quasarAutoMode && !window.isQuasarBotRunning && !window.quasarAutoLock) {
-        if (aktifModal) {
-            const kaynak = aktifModal.querySelectorAll('textarea');
-            if (kaynak.length >= 2) {
-                window.quasarAutoLock = true;
-
-                const delayMs = Math.floor(3000 + Math.random() * 2000);
-                // Burada l değişkenini kullanabilirsin
-                
-                await new Promise(resolve => setTimeout(resolve, delayMs));
-
-                // Beklemeden sonra modal hala açık mı kontrol et
-                if (!document.querySelector('.modal.show')) {
-                    window.quasarAutoLock = false;
-                    return;
-                }
-
-                const btn = document.getElementById('quasar-bot-button');
-                const status = document.getElementById('quasar-status-text');
-                if(btn) btn.textContent = l.term_btn;
-                if(status) status.textContent = l.injecting;
-
-                QuasarTypeBot();
-                window.quasarAutoLock = false;
+            if (!aktifModal && window.isQuasarBotRunning) {
+                window.stopQuasarBot = true;
+                window.isQuasarBotRunning = false;
+                quasarLog(l.textarea_err || "İşlem Durduruldu");
+                return;
             }
-        }
-    }
-}, 400);
+        
+            if (window.quasarAutoMode && !window.isQuasarBotRunning && !window.quasarAutoLock) {
+                if (aktifModal) {
+                    const kaynak = aktifModal.querySelectorAll('textarea');
+                    if (kaynak.length >= 2) {
+                        window.quasarAutoLock = true;
+        
+                        const delayMs = Math.floor(3000 + Math.random() * 2000);
+                        quasarLog(`HUMAN_WAIT: ${(delayMs/1000).toFixed(1)}s...`);
+        
+                        await new Promise(resolve => setTimeout(resolve, delayMs));
+        
+                        const halaAktifMi = [...document.querySelectorAll('.modal.show')]
+                            .find(el => getComputedStyle(el).display === 'block');
+        
+                        if (!halaAktifMi) {
+                            window.quasarAutoLock = false;
+                            quasarLog("WAIT_CANCELLED");
+                            return;
+                        }
+        
+                        const btn = document.getElementById('quasar-bot-button');
+                        const status = document.getElementById('quasar-status-text');
+        
+                        if (btn) {
+                            btn.textContent = l.term_btn;
+                            btn.style.background = '#ff0000';
+                            btn.style.color = '#000000';
+                        }
+                        if (status) status.textContent = l.injecting;
+                        window.QuasarTypeBot();
+                        window.quasarAutoLock = false;
+                    }
+                }
+            }
+        }, 400);
 
         let QuasarPanel = document.createElement('div');
         QuasarPanel.id = 'quasar-bot-panel';
